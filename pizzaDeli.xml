@@ -1,0 +1,9 @@
+<vxml version="2.1">
+<form>
+<block>
+<prompt>
+Hi, this is PizzaDeli. How are you today sir? What can I do for you?
+</prompt>
+</block>
+</form>
+</vxml>

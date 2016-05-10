@@ -1,0 +1,9 @@
+<vxml version="2.1">
+<form>
+<block>
+<prompt>
+Hi, this is the failover. Have a nice day!
+</prompt>
+</block>
+</form>
+</vxml>
