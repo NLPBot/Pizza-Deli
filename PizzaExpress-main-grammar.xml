@@ -6,6 +6,17 @@
 <!-- a grammar for collecting Pizza Express restaurant orders -->
 
 <rule id="define_mixed" scope="public">
+  <one-of>
+    <item>
+      pizza
+    </item>
+    <item>
+      salad
+    </item>
+  </one-of>
+</rule>
+
+<!-- <rule id="define_mixed" scope="public">
   <item repeat="0-2"><ruleref uri="#intro"/></item>
   <item repeat="0-2"><ruleref uri="#courtesy"/></item>
   <item repeat="0-1"><ruleref uri="#order_desire"/></item>
@@ -29,7 +40,7 @@
     </item>
   </one-of>
   <item repeat="0-1"><ruleref uri="#courtesy"/></item>
-</rule>
+</rule> -->
 
 <rule id="intro">
   <one-of>
