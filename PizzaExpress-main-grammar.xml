@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xml:lang="en-us" root="define_mixed">
+
+<meta name="maintainer" content="jeff_heath@sil.org" />
+
+<!-- a grammar for collecting Pizza Express restaurant orders -->
+
+<rule id="define_mixed" scope="public">
+  <item repeat="0-2"><ruleref uri="#intro"/></item>
+  <item repeat="0-2"><ruleref uri="#courtesy"/></item>
+  <item repeat="0-1"><ruleref uri="#order_desire"/></item>
+  <one-of>
+    <item>
+      <item repeat="0-1"><ruleref uri="#article"/></item>
+      <item repeat="0-1">
+        <ruleref uri="#TOPPING"/>
+        <item repeat="0-7">
+          <item repeat="0-1"> and </item>
+          <ruleref uri="#TOPPING"/>
+        </item>
+      </item>
+      pizza
+      <tag>out.Order="pizza";</tag>
+    </item>
+    <item>
+      <item repeat="0-1"><ruleref uri="#article"/></item>
+      salad
+      <tag>out.Order="salad";</tag>
+    </item>
+  </one-of>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
+</rule>
+
+<rule id="intro">
+  <one-of>
+    <item> hello </item>
+    <item> hi </item>
+    <item> howdy </item>
+    <item> good morning </item>
+    <item> good evening </item>
+    <item> um </item>
+    <item> uh </item>
+    <item> yes </item>
+    <item> yeah </item>
+    <item> okay </item>
+    <item> right </item>
+    <item> all right </item>
+  </one-of>
+</rule>
+
+<rule id="courtesy">
+  <one-of>
+    <item> please </item>
+    <item> thank you </item>
+    <item> if i might </item>
+    <item> if i could </item>
+    <item> if possible </item>
+  </one-of>
+</rule>
+
+<rule id="order_desire">
+  <one-of>
+    <item>
+      <one-of>
+        <item> i would like </item>
+        <item> i'd like </item>
+        <item> i want </item>
+      </one-of>
+      <item repeat="0-1"> to order </item>
+    </item>
+    <item> give me </item>
+    <item> 
+      <one-of>
+        <item> could </item>
+        <item> can </item>
+        <item> may </item>
+      </one-of>
+      i <item repeat="0-1"> please </item>
+      <one-of>
+        <item> have </item>
+        <item> order </item>
+      </one-of>
+    </item>
+  </one-of>
+</rule>
+
+<rule id="article">
+  <item>
+    <one-of>
+      <item> the </item>
+      <item> a </item>
+      <item> an </item>
+      <item> <item repeat="0-1"> one of </item> your </item>
+    </one-of>
+  </item>
+</rule>
+
+<rule id="SIZE">
+  <item>
+    <one-of>
+      <item> small </item>
+      <item> medium </item>
+      <item> large </item>
+    </one-of>
+  </item>
+</rule>
+
+<rule id="TOPPING">
+  <item>
+    <one-of>
+      <item> green pepper </item>
+      <item> mushroom </item>
+      <item> onion </item>
+      <item> pepperoni </item>
+      <item> sausage </item>
+    </one-of>
+  </item>
+</rule>
+
+<rule id="CITY">
+  <one-of>
+    <item> seattle washington <tag>out="seattle";</tag> </item>
+    <item> seattle w a <tag>out="seattle";</tag> </item>
+    <item> seattle <tag>out="seattle";</tag> </item>
+    <item> boston massachusetts <tag>out="boston";</tag> </item>
+    <item> boston mass <tag>out="boston";</tag> </item>
+    <item> boston m a <tag>out="boston";</tag> </item>
+    <item> boston <tag>out="boston";</tag> </item>
+    <item> dallas texas <tag>out="dallas";</tag> </item>
+    <item> dallas <tag>out="dallas";</tag> </item>
+    <item> chicago illinois <tag>out="chicago";</tag> </item>
+    <item> chicago <tag>out="chicago";</tag> </item>
+  </one-of>
+</rule>
+
+<rule id="RANGE">
+  <one-of>
+    <item> current <tag>out="current";</tag> </item>
+    <item> now <tag>out="current";</tag> </item>
+    <item> today <tag>out="current";</tag> </item>
+    <item> morning <tag>out="current";</tag> </item>
+    <item> afternoon <tag>out="current";</tag> </item>
+    <item> evening <tag>out="current";</tag> </item>
+    <item> short-term <tag>out="short-term";</tag> </item>
+    <item> short-range <tag>out="short-term";</tag> </item>
+    <item> long-term <tag>out="long-term";</tag> </item>
+    <item> long-range <tag>out="long-term";</tag> </item>
+  </one-of>
+</rule>
+
+
+<!-- 
+
+    Hours
+      (
+        [ ( ?( (can) (could) you ?please tell me) ?what ?are your hours ?are )
+        ( how [ (late) (long) ] are you open ) ]
+        ?[ today tomorrow ]
+        <cmd hours>
+      )
+    
+    Menu
+      (
+        [ (what ?( [sorts kinds] of [things food] ) do you [serve have])
+          (what are the [choices options]) ]
+        <cmd menu>
+      )
+-->
+
+</grammar>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xml:lang="en-US"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.w3.org/2001/vxml 
+   http://www.w3.org/TR/voicexml20/vxml.xsd">
+
+<!-- <meta name="maintainer" content="jeff_heath@sil.org"/> -->
+
+<form id="Main">
+  <var name="confirmed"/>
+  
+  <block>
+    <prompt>
+      <break time="1000ms" />
+      Pizza Express.
+    </prompt>
+  </block>
+  
+  <grammar src="./PizzaExpress-main-grammar.xml#define_mixed"/>
+  
+  <initial name="initial_request">
+    <prompt> How may I help you. </prompt>
+    
+    <catch event="nomatch"> 
+      <prompt>I didn't catch that. Please say something like "I'd like to order a pizza."</prompt>
+    </catch>
+    <catch event="nomatch" count="2"> 
+      <prompt>I'm still not catching it. Try saying just the item you would like to order, like "pizza".</prompt>
+    </catch>
+    <catch event="nomatch" count="3"> 
+      <prompt>Sorry, I'm still not catching it. Let me direct you to our menu system.</prompt>
+      <!-- go to a different system??? -->
+      <assign name="initial_request" expr="true"/>
+    </catch>
+  </initial>
+  
+
+  <!--
+  <field name="cmd"> </field>
+  <field name="item"> </field>
+  <field name="phone_number" type="phone" cond="cmd == 'order'">
+    <prompt> What's your phone number? </prompt>
+    <help> Please say your ten digit phone number. </help>
+  </field>
+  
+  <field name="delivery" type="boolean" cond="cmd == 'order'">
+    <prompt> Would you like your order delivered? </prompt>
+    <help> Would you like your order delivered? Say yes or no. </help>
+  </field>
+  
+  <record name="address" maxtime="10s"
+    finalsilence="2000ms" dtmfterm="true" type="audio/x-wav"
+    cond="cmd == 'order' &amp;&amp; delivery == yes" >
+    <prompt timeout="5s">
+      What address should we deliver to?
+    </prompt>
+    <noinput>
+      Please say your address.
+    </noinput>
+  </record>
+  
+  <field name="confirm">
+    <grammar type="application/srgs+xml" src="/grammars/boolean.grxml"/>
+    <prompt>
+      You would like a pizza delivered to <audio expr="address"/>.
+      Is this correct?
+    </prompt>
+    <filled>
+      <if cond="confirm">
+        <submit next="save_message.pl" enctype="multipart/form-data"
+           method="post" namelist="address"/>
+      </if>
+      <clear/>
+    </filled>
+  </field>
+  -->
+
+  <subdialog name="get_order_confirmation" src="./confirm.xml#getconfirmation">
+    <param name="confirm_prompt" expr="'Would you like to order a pizza?'"/>
+    <filled>
+      <assign name="confirmed" expr="get_order_confirmation.confirmation"/>
+    </filled>
+  </subdialog>
+  
+  <block>
+    <log>Jeff: Confirmed is <value expr="confirmed"/></log>
+    <if cond="confirmed == 'no'">
+      Okay, let's start over.
+      <clear namelist="initial_request confirmed"/>
+    </if>
+  </block>
+  
+  <block>
+    Great! We'll get your pizza on the way!
+  </block>
+  
+</form>
+</vxml>
