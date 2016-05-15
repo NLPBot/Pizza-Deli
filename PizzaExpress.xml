@@ -16,7 +16,16 @@
     </prompt>
   </block>
   
-  <grammar src="./PizzaExpress-main-grammar.xml#define_mixed"/>
+  <grammar>
+  <one-of>
+    <item>
+      pizza
+    </item>
+    <item>
+      salad
+    </item>
+  </one-of>
+  </grammar>
   
   <initial name="initial_request">
     <prompt> How may I help you. </prompt>
