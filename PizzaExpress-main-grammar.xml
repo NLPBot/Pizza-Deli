@@ -40,7 +40,7 @@
     </item>
   </one-of>
   <item repeat="0-1"><ruleref uri="#courtesy"/></item>
-</rule> -->
+</rule>
 
 <rule id="intro">
   <one-of>
@@ -157,7 +157,7 @@
     <item> long-term <tag>out="long-term";</tag> </item>
     <item> long-range <tag>out="long-term";</tag> </item>
   </one-of>
-</rule>
+</rule> -->
 
 
 <!-- 

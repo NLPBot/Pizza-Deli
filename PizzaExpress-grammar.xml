@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xml:lang="en-us" tag-format="semantics/1.0" root="define_mixed">
+
+<meta name="maintainer" content="jeff_heath@sil.org" />
+
+<!-- a grammar for collecting Pizza Express restaurant orders -->
+
+<rule id="define_mixed" scope="public">
+  <item repeat="0-2"><ruleref uri="#intro"/></item>
+  <item repeat="0-2"><ruleref uri="#courtesy"/></item>
+  <one-of>
+    <!--<tag>out.Cmd = new Object();</tag>-->
+    <!-- specify the different commands possible -->
+    <item> <!-- food order -->
+      <item repeat="0-1"><ruleref uri="#order_desire"/></item>
+      <one-of>
+        <item>
+          <ruleref uri="#PIZZA"/> <tag>out.Order=rules.PIZZA;</tag>
+        </item>
+        <item>
+          <ruleref uri="#SALAD"/> <tag>out.Order=rules.SALAD;</tag>
+        </item>
+      </one-of>
+      <tag>out.Cmd="Order";</tag>
+    </item>
+    <item> <!-- request for hours -->
+      <ruleref uri="#hours_request"/>
+      <tag>out.Cmd="Hours";</tag>
+    </item>
+  </one-of>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
+</rule>
+
+
+<!-- rule for specifying pizza -->
+<rule id="PIZZA">
+  <item repeat="0-1">
+    <ruleref uri="#NUMBER"/> <tag> out.Number=rules.NUMBER;</tag>
+  </item>
+  <item repeat="0-1">
+    <ruleref uri="#SIZE"/> <tag> out.Size=rules.SIZE;</tag>
+  </item>
+  <one-of>
+    <item>
+      <item repeat="0-1"><ruleref uri="#TOPPINGS"/></item>
+      <tag>out.Toppings=rules.TOPPINGS;</tag>
+      <one-of>
+        <item> pizza </item>
+        <item> pizzas </item>
+      </one-of>
+      <tag>out.Item="pizza";</tag>
+    </item>
+    <item>
+      <one-of>
+        <item> pizza </item>
+        <item> pizzas </item>
+      </one-of>
+      with
+      <ruleref uri="#TOPPINGS"/>
+      <tag>out.Toppings=rules.TOPPINGS;</tag>
+      <tag>out.Item="pizza";</tag>
+    </item>
+  </one-of>
+</rule>
+
+<!-- build an array of the toppings -->
+<rule id="TOPPINGS">
+  <tag>out=new Array;</tag>
+  <ruleref uri="#TOPPING"/>
+  <tag>out.push(rules.TOPPING);</tag>
+  <item repeat="0-">
+    <item repeat="0-1"> and </item>
+    <ruleref uri="#TOPPING"/>
+    <tag>out.push(rules.TOPPING);</tag>
+  </item>
+</rule>
+
+<!-- rule for an individual (standardized) topping -->
+<rule id="TOPPING">
+  <item>
+    <one-of>
+      <item> green pepper </item>
+      <item> pepper <tag>out="green pepper";</tag> </item>
+      <item> mushroom </item>
+      <item> mushrooms <tag>out="mushroom";</tag> </item>
+      <item> shrooms <tag>out="mushroom";</tag> </item>
+      <item> onion </item>
+      <item> pepperoni </item>
+      <item> sausage </item>
+    </one-of>
+  </item>
+</rule>
+
+<!-- rule for specifying salad -->
+<rule id="SALAD">
+  <item repeat="0-1">
+    <ruleref uri="#NUMBER"/> <tag> out.Number=rules.NUMBER;</tag>
+  </item>
+  <item>
+    salad
+    <tag>out.Item="salad";</tag>
+  </item>
+</rule>
+
+<rule id="NUMBER">
+  <one-of>
+    <item>
+      <one-of>
+        <item> the </item>
+        <item> a </item>
+        <item> an </item>
+        <item> <item repeat="0-1"> one of </item> your </item>
+      </one-of>
+      <tag>out=1;</tag>
+    </item>
+    <item> two <tag>out=2;</tag> </item>
+    <item> three <tag>out=3;</tag> </item>
+    <item> four <tag>out=4;</tag> </item>
+  </one-of>
+</rule>
+
+<rule id="SIZE">
+  <item>
+    <one-of>
+      <item> small </item>
+      <item> medium </item>
+      <item> large </item>
+    </one-of>
+  </item>
+</rule>
+
+
+<rule id="intro">
+  <one-of>
+    <item> hello </item>
+    <item> hi </item>
+    <item> howdy </item>
+    <item> good morning </item>
+    <item> good evening </item>
+    <item> um </item>
+    <item> uh </item>
+    <item> yes </item>
+    <item> yeah </item>
+    <item> okay </item>
+    <item> right </item>
+    <item> all right </item>
+  </one-of>
+</rule>
+
+<rule id="courtesy">
+  <one-of>
+    <item> please </item>
+    <item> thank you </item>
+    <item> if i might </item>
+    <item> if i could </item>
+    <item> if possible </item>
+  </one-of>
+</rule>
+
+<rule id="order_desire">
+  <one-of>
+    <item>
+      <one-of>
+        <item> i would like </item>
+        <item> i'd like </item>
+        <item> i want </item>
+      </one-of>
+      <item repeat="0-1"> to order </item>
+    </item>
+    <item> give me </item>
+    <item> 
+      <one-of>
+        <item> could </item>
+        <item> can </item>
+        <item> may </item>
+      </one-of>
+      i <item repeat="0-1"> please </item>
+      <one-of>
+        <item> have </item>
+        <item> order </item>
+      </one-of>
+    </item>
+  </one-of>
+</rule>
+
+<rule id="hours_request">
+  <one-of>
+    <item>
+      <item repeat="0-1">
+        <one-of>
+          <item>
+            <one-of>
+              <item> i would like </item>
+              <item> i'd like </item>
+              <item> i want </item>
+            </one-of>
+            <item repeat="0-1"> to know </item>
+          </item>
+          <item> give me </item>
+          <item> 
+            <one-of>
+              <item> could </item>
+              <item> can </item>
+              <item> may </item>
+            </one-of>
+            i <item repeat="0-1"> please </item>
+            <one-of>
+              <item> have </item>
+            </one-of>
+          </item>
+          <item> 
+            what
+            <one-of>
+              <item> is </item>
+              <item> are </item>
+            </one-of>
+          </item>
+        </one-of>
+      </item>
+      <item repeat="0-1">
+        <one-of>
+          <item> your </item>
+          <item> the </item>
+        </one-of>
+      </item>
+      <one-of> <!-- this is the required part -->
+        <item> hours </item>
+        <item> schedule </item>
+      </one-of>
+    </item>
+    <item>
+      how
+      <one-of>
+        <item> late </item>
+        <item> long </item>
+      </one-of>
+      <one-of>
+        <item> are you </item>
+        <item> is the restaurant </item>
+      </one-of>
+      open
+    </item>
+  </one-of>
+</rule>
+
+
+<rule id="get_cmd" scope="public">
+  <one-of>
+    <item> order </item>
+    <item> hours </item>
+  </one-of>
+</rule>
+
+
+
+<!-- 
+
+    Hours
+      (
+        [ ( ?( (can) (could) you ?please tell me) ?what ?are your hours ?are )
+        ( how [ (late) (long) ] are you open ) ]
+        ?[ today tomorrow ]
+        <cmd hours>
+      )
+    
+    Menu
+      (
+        [ (what ?( [sorts kinds] of [things food] ) do you [serve have])
+          (what are the [choices options]) ]
+        <cmd menu>
+      )
+-->
+
+</grammar>
