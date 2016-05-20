@@ -354,8 +354,8 @@
     <param name="confirm_prompt" expr="'Can you confirm your phone number is ' + sayPhoneNum(phone_num) + '?'"/>
 <!--        <say-as interpret-as="vxml:phone"><value expr="phone_num"/></say-as>? -->
     <filled>
-      <log>Confirmation: <value expr="get_confirmation.confirmation"/></log>
-      <if cond="get_confirmation.confirmation == 'no'">
+      <log>Confirmation: <value expr="get_phone_confirmation.confirmation"/></log>
+      <if cond="get_phone_confirmation.confirmation == 'no'">
         <subdialog name="get_phone_num" src="phonenum.xml#getphonenum">
           <filled>
             <assign name="phone_num" expr="get_phone_num.phonenum"/>

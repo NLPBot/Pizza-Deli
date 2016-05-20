@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.w3.org/2001/vxml 
+   http://www.w3.org/TR/voicexml20/vxml.xsd">
+
+<meta name="maintainer" content="jeff_heath@sil.org" />
+
+<!-- subdialog for getting a phone number -->
+<form id="getphonenum">
+  <field name="phonenum" type="digits">
+    <prompt>What's your phone number.</prompt>
+    <nomatch>
+      Please say your 10 digit phone number.
+    </nomatch>
+    <nomatch count="2">
+      Please clearly say your 10 digit phone number.
+    </nomatch>
+    <nomatch count="4">
+      <prompt>I'm not following you. Please call back later.</prompt>
+      <exit/>
+    </nomatch>
+    <help>
+      Please individually say each of the 10 digits of your phone number.
+      <reprompt/>
+    </help>
+    <filled>
+      <return namelist="phonenum"/>
+    </filled>
+  </field>
+</form>
+
+</vxml>
