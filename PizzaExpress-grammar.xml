@@ -9,7 +9,6 @@
   <item repeat="0-2"><ruleref uri="#intro"/></item>
   <item repeat="0-2"><ruleref uri="#courtesy"/></item>
   <one-of>
-    <!--<tag>out.Cmd = new Object();</tag>-->
     <!-- specify the different commands possible -->
     <item> <!-- food order -->
       <item repeat="0-1"><ruleref uri="#order_desire"/></item>
@@ -22,6 +21,10 @@
         </item>
       </one-of>
       <tag>out.Cmd="Order";</tag>
+    </item>
+    <item> <!-- end of order -->
+      <ruleref uri="#finish_request"/>
+      <tag>out.Cmd="Finished";</tag>
     </item>
     <item> <!-- request for hours -->
       <ruleref uri="#hours_request"/>
@@ -42,8 +45,15 @@
   </item>
   <one-of>
     <item>
-      <item repeat="0-1"><ruleref uri="#TOPPINGS"/></item>
-      <tag>out.Toppings=rules.TOPPINGS;</tag>
+      <item repeat="0-1">
+        <one-of>
+          <item><ruleref uri="#TOPPINGS"/>
+            <tag>out.Toppings=rules.TOPPINGS;</tag></item>
+          <item><ruleref uri="#SPECIALTY"/>
+            <!-- put in a list so it's the same format as toppings -->
+            <tag>out.Toppings=[rules.SPECIALTY];</tag></item>
+        </one-of>
+      </item>
       <one-of>
         <item> pizza </item>
         <item> pizzas </item>
@@ -63,9 +73,9 @@
   </one-of>
 </rule>
 
-<!-- build an array of the toppings -->
+<!-- rule for building an array of the toppings -->
 <rule id="TOPPINGS">
-  <tag>out=new Array;</tag>
+  <tag>out=[];</tag>
   <ruleref uri="#TOPPING"/>
   <tag>out.push(rules.TOPPING);</tag>
   <item repeat="0-">
@@ -79,17 +89,52 @@
 <rule id="TOPPING">
   <item>
     <one-of>
+      <item> <item repeat="0-1"> extra </item> cheese
+        <tag>out="extra cheese";</tag> </item>
+      <item> <one-of> <item>anchovy</item> <item>anchovies</item> </one-of>
+        <tag>out="anchovy";</tag> </item>
+      <item> <one-of> <item>onion</item> <item>onions</item> </one-of>
+        <tag>out="onion";</tag> </item>
       <item> green pepper </item>
-      <item> pepper <tag>out="green pepper";</tag> </item>
-      <item> mushroom </item>
-      <item> mushrooms <tag>out="mushroom";</tag> </item>
-      <item> shrooms <tag>out="mushroom";</tag> </item>
-      <item> onion </item>
-      <item> pepperoni </item>
+      <item> <item repeat="0-1"> green </item>
+        <one-of> <item>pepper</item> <item>peppers</item> </one-of>
+        <tag>out="green pepper";</tag> </item>
+      <item> eggplant </item>
+      <item> ham </item>
+      <item> <one-of> <item>tomato</item> <item>tomatoes</item> </one-of>
+        <tag>out="tomato";</tag> </item>
+      <item> pineapple </item>
+      <item> <item repeat="0-1"> black </item>
+        <one-of> <item>olive</item> <item>olives</item> </one-of>
+        <tag>out="black olive";</tag> </item>
       <item> sausage </item>
+      <item> broccoli </item>
+      <item> pepperoni </item>
+      <item> <one-of> <item>hamburg</item> <item>hamburger</item> </one-of>
+        <tag>out="hamburger";</tag> </item>
+      <item> salami </item>
+      <item> bacon </item>
+      <item> sausage </item>
+      <item> <one-of> <item>mushroom</item> <item>mushrooms</item>
+        <item>shroom</item> <item>shrooms</item> </one-of>
+        <tag>out="mushroom";</tag> </item>
     </one-of>
   </item>
 </rule>
+
+<!-- rule for specialty pizza types -->
+<rule id="SPECIALTY">
+  <one-of>
+    <item> <item repeat="0-1"> house </item> special
+      <tag>out="house special";</tag> </item>
+    <item> buffalo chicken </item>
+    <item> spinach and feta </item>
+    <item> chicken <item repeat="0-1"> kabob </item> and broccoli 
+      <tag>out="chicken kabob and broccoli";</tag> </item>
+    <item> barbeque chicken </item>
+  </one-of>
+</rule>
+
 
 <!-- rule for specifying salad -->
 <rule id="SALAD">
@@ -123,8 +168,8 @@
   <item>
     <one-of>
       <item> small </item>
-      <item> medium </item>
       <item> large </item>
+      <item> big <tag>out="large";</tag> </item>
     </one-of>
   </item>
 </rule>
@@ -158,12 +203,13 @@
 </rule>
 
 <rule id="order_desire">
+  <item repeat="0-1"> also </item>
   <one-of>
     <item>
       <one-of>
-        <item> i would like </item>
-        <item> i'd like </item>
-        <item> i want </item>
+        <item> i would <item repeat="0-1"> also </item> like </item>
+        <item> i'd <item repeat="0-1"> also </item> like </item>
+        <item> i <item repeat="0-1"> also </item> want </item>
       </one-of>
       <item repeat="0-1"> to order </item>
     </item>
@@ -175,6 +221,7 @@
         <item> may </item>
       </one-of>
       i <item repeat="0-1"> please </item>
+      <item repeat="0-1"> also </item>
       <one-of>
         <item> have </item>
         <item> order </item>
@@ -243,12 +290,58 @@
   </one-of>
 </rule>
 
-
-<rule id="get_cmd" scope="public">
+<rule id="finish_request">
   <one-of>
-    <item> order </item>
-    <item> hours </item>
+    <item>
+      <one-of>
+        <item> that is </item>
+        <item> that's </item>
+      </one-of>
+      <one-of>
+        <item> all </item>
+        <item> everything </item>
+        <item> it </item>
+      </one-of>
+      <item repeat="0-1">
+        <one-of>
+          <item> i would like </item>
+          <item> i'd like </item>
+          <item> i want </item>
+        </one-of>
+      </item>
+    </item>
+    <item>
+      nothing <item repeat="0-1"> else </item>
+    </item>
   </one-of>
+  <item repeat="0-1"> for 
+    <one-of>
+      <item> now </item>
+      <item> the moment </item>
+    </one-of>
+  </item>
+</rule>
+
+
+
+<!-- grammar rules for getting specific information -->
+
+<rule id="grm_toppings" scope="public">
+  <item repeat="0-2"><ruleref uri="#intro"/></item>
+  <item repeat="0-2"><ruleref uri="#courtesy"/></item>
+  <item repeat="0-1"><ruleref uri="#order_desire"/></item>
+  <ruleref uri="#TOPPINGS"/>
+  <tag>out.Toppings=rules.TOPPINGS;</tag>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
+</rule>
+
+<rule id="grm_size" scope="public">
+  <item repeat="0-2"><ruleref uri="#intro"/></item>
+  <item repeat="0-2"><ruleref uri="#courtesy"/></item>
+  <item repeat="0-1"><ruleref uri="#order_desire"/></item>
+  <ruleref uri="#SIZE"/>
+  <tag>out=rules.SIZE;</tag>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
 </rule>
 
 

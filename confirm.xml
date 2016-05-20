@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://www.w3.org/2001/vxml 
+   http://www.w3.org/TR/voicexml20/vxml.xsd">
+
+<meta name="maintainer" content="jeff_heath@sil.org" />
+
+<!-- subdialog for yes/no confirmation -->
+<form id="getconfirmation">
+  <var name="confirm_prompt"/>
+  <field name="confirmation">
+    <prompt><value expr="confirm_prompt"/></prompt>
+    <grammar src="yesno.xml"/>
+    <noinput>
+      Sorry I couldn't hear you. 
+      <reprompt/>
+    </noinput>
+    <nomatch>
+      Please say yes or no.
+      <value expr="confirm_prompt"/>
+    </nomatch>
+    <nomatch count="4">
+      <prompt>I'm not following you. Please call back later.</prompt>
+      <exit/>
+    </nomatch>
+    <help>
+      Please say yes or no.
+      <reprompt/>
+    </help>
+    <filled>
+      <return namelist="confirmation"/>
+    </filled>
+  </field>
+</form>
+
+</vxml>

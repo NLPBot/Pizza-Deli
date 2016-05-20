@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xml:lang="en" root="yesno">
+
+<meta name="maintainer" content="jeff_heath@sil.org" />
+
+<!-- a grammar for yes/no responses -->
+
+<rule id="yesno" scope="public">
+  <one-of>
+    <item><ruleref uri="#yes"/><tag>yes</tag></item>
+    <item><ruleref uri="#no"/><tag>no</tag></item>
+  </one-of>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
+</rule>
+<rule id="yes">
+  <one-of>
+    <item> yes </item>
+    <item> yep </item>
+    <item> OK </item>
+    <item> yeah </item>
+    <item> sure </item>
+    <item> yes ma'am </item>
+    <item> affirmative </item>
+    <item>
+      <item repeat="0-1">
+        <one-of> <item>that is</item> <item>that's</item> </one-of>
+      </item>
+      <one-of>
+        <item> right </item>
+        <item> correct </item>
+        <item> affirmative </item>
+      </one-of>
+    </item>
+  </one-of>
+</rule>
+<rule id="no">
+  <one-of>
+    <item> no </item>
+    <item> nope </item>
+    <item> nah </item>
+    <item> not </item>
+    <item> no ma'am </item>
+    <item> negative </item>
+  </one-of>
+</rule>
+<rule id="courtesy">
+  <one-of>
+    <item> thank you </item>
+    <item> thanks </item>
+    <item> please </item>
+  </one-of>
+</rule>
+
+</grammar>
