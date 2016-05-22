@@ -135,18 +135,59 @@
   </one-of>
 </rule>
 
-
 <!-- rule for specifying salad -->
 <rule id="SALAD">
   <item repeat="0-1">
     <ruleref uri="#NUMBER"/> <tag> out.Number=rules.NUMBER;</tag>
   </item>
-  <item>
-    salad
-    <tag>out.Item="salad";</tag>
+  <item repeat="0-1">
+    <ruleref uri="#SIZE"/> <tag> out.Size=rules.SIZE;</tag>
   </item>
+  <item repeat="0-1"><ruleref uri="#SALADTYPE"/>
+    <tag>out.Type=rules.SALADTYPE;</tag></item>
+  <one-of>
+    <item> salad </item>
+    <item> salads </item>
+  </one-of>
+  <item repeat="0-1">
+    with
+    <ruleref uri="#SALADDRESSING"/>
+    <tag>out.Dressing=rules.SALADDRESSING;</tag>
+    <item repeat="0-1"> dressing </item>
+  </item>
+  <tag>out.Item="salad";</tag>
 </rule>
 
+<!-- rule for salad types -->
+<rule id="SALADTYPE">
+  <one-of>
+    <item> chicken <item repeat="0-1"> kabob </item>
+      <tag>out="chicken kabob";</tag> </item>
+    <item> greek </item>
+    <item> chef </item>
+    <item> anitpasto </item>
+    <item> tuna </item>
+    <item> caesar </item>
+    <item> garden </item>
+  </one-of>
+</rule>
+
+<!-- rule for salad types -->
+<rule id="SALADDRESSING">
+  <one-of>
+    <item> ranch </item>
+    <item> italian </item>
+    <item> creamy italian </item>
+    <item> blue cheese </item>
+    <item> greek </item>
+    <item> caesar </item>
+    <item> <item repeat="0-1"> fat free </item> raspberry vinaigrette
+      <tag>out="raspberry vinaigrette";</tag> </item>
+  </one-of>
+</rule>
+
+
+<!-- other rules -->
 <rule id="NUMBER">
   <one-of>
     <item>
@@ -161,6 +202,7 @@
     <item> two <tag>out=2;</tag> </item>
     <item> three <tag>out=3;</tag> </item>
     <item> four <tag>out=4;</tag> </item>
+    <item> five <tag>out=5;</tag> </item>
   </one-of>
 </rule>
 
@@ -170,7 +212,14 @@
       <item> small </item>
       <item> large </item>
       <item> big <tag>out="large";</tag> </item>
+      <item> regular <tag>out="large";</tag> </item>
     </one-of>
+    <item repeat="0-1">
+      <one-of>
+        <item> size </item>
+        <item> sized </item>
+      </one-of>
+    </item>
   </item>
 </rule>
 
@@ -203,6 +252,7 @@
 </rule>
 
 <rule id="order_desire">
+  <item repeat="0-1"> and </item>
   <item repeat="0-1"> also </item>
   <one-of>
     <item>
@@ -211,7 +261,13 @@
         <item> i'd <item repeat="0-1"> also </item> like </item>
         <item> i <item repeat="0-1"> also </item> want </item>
       </one-of>
-      <item repeat="0-1"> to order </item>
+      <item repeat="0-1"> to 
+        <one-of>
+          <item> order </item>
+          <item> get </item>
+          <item> have </item>
+        </one-of>
+      </item>
     </item>
     <item> give me </item>
     <item> 
@@ -313,6 +369,20 @@
     <item>
       nothing <item repeat="0-1"> else </item>
     </item>
+    <item>
+      <item repeat="0-1">
+        <one-of>
+          <item> i am </item>
+          <item> i'm </item>
+        </one-of>
+      </item>
+      <item repeat="0-1"> all </item>
+      <one-of>
+        <item> done </item>
+        <item> finished </item>
+        <item> set </item>
+      </one-of>
+    </item>
   </one-of>
   <item repeat="0-1"> for 
     <one-of>
@@ -341,6 +411,25 @@
   <item repeat="0-1"><ruleref uri="#order_desire"/></item>
   <ruleref uri="#SIZE"/>
   <tag>out=rules.SIZE;</tag>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
+</rule>
+
+<rule id="grm_salad_type" scope="public">
+  <item repeat="0-2"><ruleref uri="#intro"/></item>
+  <item repeat="0-2"><ruleref uri="#courtesy"/></item>
+  <item repeat="0-1"><ruleref uri="#order_desire"/></item>
+  <ruleref uri="#SALADTYPE"/>
+  <tag>out=rules.SALADTYPE;</tag>
+  <item repeat="0-1"> salad </item>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
+</rule>
+
+<rule id="grm_salad_dressing" scope="public">
+  <item repeat="0-2"><ruleref uri="#intro"/></item>
+  <item repeat="0-2"><ruleref uri="#courtesy"/></item>
+  <item repeat="0-1"><ruleref uri="#order_desire"/></item>
+  <ruleref uri="#SALADDRESSING"/>
+  <tag>out=rules.SALADDRESSING;</tag>
   <item repeat="0-1"><ruleref uri="#courtesy"/></item>
 </rule>
 

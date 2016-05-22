@@ -9,9 +9,9 @@
 <!-- subdialog for yes/no confirmation -->
 <form id="getconfirmation">
   <var name="confirm_prompt"/>
-  <field name="confirmation">
+  <field name="yesno">
     <prompt><value expr="confirm_prompt"/></prompt>
-    <grammar src="yesno.xml"/>
+    <grammar maxage="0" src="yesno.xml"/>
     <noinput>
       Sorry I couldn't hear you. 
       <reprompt/>
@@ -29,7 +29,8 @@
       <reprompt/>
     </help>
     <filled>
-      <return namelist="confirmation"/>
+      <log>yesno: <value expr="yesno"/></log>
+      <return namelist="yesno"/>
     </filled>
   </field>
 </form>

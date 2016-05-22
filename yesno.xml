@@ -7,11 +7,12 @@
 
 <rule id="yesno" scope="public">
   <one-of>
-    <item><ruleref uri="#yes"/><tag>yes</tag></item>
-    <item><ruleref uri="#no"/><tag>no</tag></item>
+    <item><ruleref uri="#yes"/> <tag>out.yesno="yes";</tag> </item>
+    <item><ruleref uri="#no"/> <tag>out.yesno="no";</tag> </item>
   </one-of>
   <item repeat="0-1"><ruleref uri="#courtesy"/></item>
 </rule>
+
 <rule id="yes">
   <one-of>
     <item> yes </item>
@@ -33,6 +34,7 @@
     </item>
   </one-of>
 </rule>
+
 <rule id="no">
   <one-of>
     <item> no </item>
@@ -43,6 +45,7 @@
     <item> negative </item>
   </one-of>
 </rule>
+
 <rule id="courtesy">
   <one-of>
     <item> thank you </item>
