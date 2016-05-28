@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xml:lang="en-US"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xsi:schemaLocation="http://www.w3.org/2001/vxml 
-   http://www.w3.org/TR/voicexml20/vxml.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.w3.org/2001/vxml http://www.w3.org/TR/voicexml20/vxml.xsd"
+  xmlns:voxeo="http://community.voxeo.com/xmlns/vxml">
 
 <meta name="maintainer" content="jeff_heath@sil.org"/>
 
@@ -20,19 +20,10 @@
 <var name="total_confidence_score" expr="1"/>
 <var name="confirmed"/>
 
-<property name="universals" value="help exit repeat" />
-
-<catch event="repeat">
-  <reprompt />
-</catch>
-
-<catch event="exit">
-  <prompt> Okay, Goodbye. </prompt>
-  <exit/>
-</catch>
+<property name="universals" value="help repeat" />
 
 <!-- define global help commands -->
-<link event="help">
+<link event="help" scope="global">
   <grammar root="help">
     <rule id="help" scope="public">
       <one-of>
@@ -45,8 +36,24 @@
   </grammar>
 </link>
 
+<catch event="repeat">
+  <reprompt />
+</catch>
+
+<!-- define a way to cancel the session -->
+<link next="#frm_cancel" scope="public">
+  <grammar root="cancel">
+    <rule id="cancel" scope="public">
+      <one-of>
+        <item>cancel</item>
+        <item>abort</item>
+      </one-of>
+    </rule>
+  </grammar>
+</link>
+
 <!-- define a way to restart the session -->
-<link next="#frm_restart">
+<link next="#frm_restart" scope="public">
   <grammar root="restart">
     <rule id="restart" scope="public">
       <one-of>
@@ -76,6 +83,7 @@
 <!-- define the welcome form -->
 <form id="frm_welcome">
   <block>
+    <voxeo:recordcall info="pizzaExpress" value="100"/>
     <prompt bargein="false">
       <break time="1000ms" />
       Welcome to Pizza iks-press.
@@ -111,16 +119,21 @@
       <prompt>Sorry, I'm still not catching it.</prompt>
       <goto next="#frm_finished"/>
     </catch>
+    <catch event="help"> 
+      <prompt>Say something like <break time="150"/> "I'd like a large sausage pizza" or "chef salad with ranch dressing".
+      To cancel you can simply hang up.</prompt>
+      <reprompt/>
+    </catch>
   </initial>
   
   <field name="Cmd">
     <!-- defines the field, but processing should never get here -->
-    <prompt> Internal error in field Command. </prompt>
+    <prompt> Internal error in the field Command. </prompt>
   </field>
   
   <field name="Order">
     <!-- defines the field, but processing should never get here -->
-    <prompt> Internal error in field Order. </prompt>
+    <prompt> Internal error in the field Order. </prompt>
   </field>
   
   <filled namelist="Cmd">
@@ -142,6 +155,8 @@
         <goto next="#frm_order_pizza"/>
       <elseif cond="Order.Item=='salad'" />
         <goto next="#frm_order_salad"/>
+      <elseif cond="Order.Item=='drink'" />
+        <goto next="#frm_order_drink"/>
       <else />
         <prompt> Invalid order. </prompt>
       </if>
@@ -151,47 +166,42 @@
     <clear namelist="Cmd curr_order"/>
   </filled>
 
-  <!--
-  <field name="cmd"> </field>
-  <field name="item"> </field>
-  <field name="phone_number" type="phone" cond="cmd == 'order'">
-    <prompt> What's your phone number? </prompt>
-    <help> Please say your ten digit phone number. </help>
-  </field>
-  
-  
-  -->
-<!--
-  <subdialog name="get_order_confirmation" src="./confirm.xml#getconfirmation">
-    <param name="confirm_prompt" expr="'Would you like to order a pizza?'"/>
-    <filled>
-      <assign name="confirmed" expr="get_order_confirmation.yesno"/>
-    </filled>
-  </subdialog>
-  
-  <block>
-    <log>Jeff: Confirmed is <value expr="confirmed"/></log>
-    <if cond="confirmed == 'no'">
-      Okay, let's start over.
-      <clear namelist="initial_request confirmed"/>
-    </if>
-  </block>
--->
-  
 </form>
 
 
+<!-- define a way to exit the session -->
+<form id="frm_exit">
+  <subdialog name="get_confirmation" src="#getconfirmation">
+    <param name="confirm_prompt" expr="'Would you like to exit without placing an order?'"/>
+    <filled>
+      <if cond="get_confirmation.yesno == 'yes'">
+        <prompt> Okay, Goodbye. </prompt>
+        <exit/>
+      </if>
+      <prompt bargein="false"> Okay, let's continue. </prompt>
+      <goto next="#frm_main" />
+    </filled>
+  </subdialog>
+</form>
+
 <!-- define a way to restart the session -->
 <form id="frm_restart">
-  <block>
-    <prompt bargein="false"> Okay, let's start from scratch. </prompt>
-    <!-- clear all variables, and initialize a few key ones -->
-    <clear/>
-    <assign name="curr_prompt" expr="'How may I help you.'"/>
-    <assign name="phone_num" expr="session.callerid"/>
-    <assign name="all_orders" expr="[]"/>
-    <goto next="#frm_main" />
-  </block>
+  <subdialog name="get_confirmation" src="#getconfirmation">
+    <param name="confirm_prompt" expr="'Would you like to start over from scratch?'"/>
+    <filled>
+      <if cond="get_confirmation.yesno == 'yes'">
+        <prompt bargein="false"> Okay, let's start over. </prompt>
+        <!-- clear all variables, and initialize a few key ones -->
+        <clear/>
+        <assign name="curr_prompt" expr="'How may I help you.'"/>
+        <assign name="phone_num" expr="session.callerid"/>
+        <assign name="all_orders" expr="[]"/>
+      <else/>
+        <prompt bargein="false"> Okay, let's continue. </prompt>
+      </if>
+      <goto next="#frm_main" />
+    </filled>
+  </subdialog>
 </form>
 
 
@@ -203,20 +213,19 @@
     </if>
   </block>
   
-  <subdialog name="get_confirmation" src="confirm.xml#getconfirmation">
-    <param name="confirm_prompt" expr="'Would you like to know our hours?'"/>
+  <subdialog name="get_confirmation" src="#getconfirmation">
+    <param name="confirm_prompt" expr="'Are you asking about our hours?'"/>
     <filled>
       <log>Jeff: Confirmed is <value expr="get_confirmation.yesno"/></log>
       <if cond="get_confirmation.yesno == 'no'">
-        Okay, let's start over.
-        <clear namelist="get_confirmation"/>
+        Okay, let's try again.
         <goto next="#frm_main"/>
       </if>
     </filled>
   </subdialog>
   
   <block>
-    <prompt> We are open 10 a m to 9 p m Monday through Saturday. </prompt>
+    <prompt> We are open 11 a m to 9 p m Monday through Saturday. </prompt>
     <if cond="all_orders.length &gt; 0">
       <assign name="curr_prompt" expr="'What else would you like to order.'"/>
     <else/>
@@ -229,23 +238,59 @@
 
 <!-- dialog for confirming that the pizza order is complete -->
 <form id="frm_order_pizza">
+  <var name="number_str"/>
+  <var name="size_str"/>
+  <var name="toppings_str" expr="''"/>
+  <var name="pizza_str" expr="'pizza'"/>
+  
   <block>
     <log>Item: <value expr="curr_order.Item"/></log>
     <log>Toppings: <value expr="curr_order.Toppings"/></log>
     <script><![CDATA[
       if (!("Number" in curr_order)) {
         // just use default number, if not specified
-        curr_order.Number = 1;
+        curr_order.Number = "1";
       }
-      toppings = curr_order.Toppings;
+      number_str = curr_order.Number;
+      if (parseInt(number_str, 10) > 1) {
+        pizza_str = "pizzas";
+      }
+      
       size = curr_order.Size;
+      if ("Size" in curr_order) {
+        size_str = size;
+      } else {
+        // we don't know the size yet
+        size_str = "";
+      }
+      
+      toppings = curr_order.Toppings;
+      if ("Toppings" in curr_order) {
+        if (curr_order.Toppings.length > 1) {
+          toppings_str = curr_order.Toppings.slice(0,curr_order.Toppings.length-1).toString() +
+                 " and " + curr_order.Toppings[curr_order.Toppings.length-1];
+        } else {
+          toppings_str += curr_order.Toppings[0];
+        }
+      } else {
+        // we don't know the toppings yet
+        toppings_str = "";
+      }
+      
+      if (confidence_score > 0.8) {
+        // reduce grounding if we are pretty confident
+        number_str = "";
+        size_str = "";
+        toppings_str = "";
+      }
       ]]>
     </script>
     <log>Number: <value expr="curr_order.Number"/></log>
+    <log>toppings_str: <value expr="toppings_str"/></log>
   </block>
   
   <field name="toppings">
-    <prompt> What would you like on your pizza? </prompt>
+    <prompt> What would you like on your <value expr="number_str"/> <value expr="size_str"/> <value expr="pizza_str"/>? </prompt>
     <grammar src="PizzaExpress-grammar.xml#grm_toppings"/>
     <nomatch>
       Please say the toppings you want for this pizza or select a specialty pizza.
@@ -255,16 +300,20 @@
       <exit/>
     </nomatch>
     <help>
-      Please select the toppings you want, like sausage and onion, or select a specialty pizza, like Hawaiian.
+      Please select the toppings you want, like sausage and onion, or select a specialty pizza, like house special.
     </help>
     <filled>
-      <!-- TODO: keep lower confidence score -->
+      <!-- keep lower confidence score -->
+      <if cond="application.lastresult$.confidence &lt; confidence_score">
+        <assign name="confidence_score" expr="application.lastresult$.confidence"/>
+        <log>New confidence: <value expr="confidence_score"/></log>
+      </if>
       <assign name="curr_order.Toppings" expr="toppings.Toppings"/>
     </filled>
   </field>
   
   <field name="size">
-    <prompt> What size pizza would you like? </prompt>
+    <prompt> What size <value expr="toppings_str"/> <value expr="pizza_str"/> would you like? </prompt>
     <grammar src="PizzaExpress-grammar.xml#grm_size"/>
     <nomatch>
       Please say small or large.
@@ -278,7 +327,11 @@
       Please say the size of pizza you want, either small or large.
     </help>
     <filled>
-      <!-- TODO: keep lower confidence score -->
+      <!-- keep lower confidence score -->
+      <if cond="application.lastresult$.confidence &lt; confidence_score">
+        <assign name="confidence_score" expr="application.lastresult$.confidence"/>
+        <log>New confidence: <value expr="confidence_score"/></log>
+      </if>
       <log>Size: <value expr="size"/></log>
       <assign name="curr_order.Size" expr="size"/>
     </filled>
@@ -300,7 +353,7 @@
     <script><![CDATA[
       if (!("Number" in curr_order)) {
         // just use default number, if not specified
-        curr_order.Number = 1;
+        curr_order.Number = "1";
       }
       type = curr_order.Type;
       dressing = curr_order.Dressing;
@@ -378,6 +431,53 @@
 </form>
 
 
+<!-- dialog for confirming that the drink order is complete -->
+<form id="frm_order_drink">
+  <block>
+    <log>Item: <value expr="curr_order.Item"/></log>
+    <log>Type: <value expr="curr_order.Type"/></log>
+    <script><![CDATA[
+      if (!("Number" in curr_order)) {
+        // just use default number, if not specified
+        curr_order.Number = "1";
+      }
+      size = curr_order.Size;
+      ]]>
+    </script>
+    <log>Number: <value expr="curr_order.Number"/></log>
+  </block>
+  
+  <field name="size">
+    <prompt> What size <value expr="curr_order.Item"/> would you like? </prompt>
+    <grammar src="PizzaExpress-grammar.xml#grm_size"/>
+    <nomatch>
+      Please say small or large.
+      <reprompt/>
+    </nomatch>
+    <nomatch count="3">
+      <prompt>I'm not following you. Please call back later.</prompt>
+      <exit/>
+    </nomatch>
+    <help>
+      Please say the size of drink you want, either small or large.
+    </help>
+    <filled>
+      <!-- keep lower confidence score -->
+      <if cond="application.lastresult$.confidence &lt; confidence_score">
+        <assign name="confidence_score" expr="application.lastresult$.confidence"/>
+        <log>New confidence: <value expr="confidence_score"/></log>
+      </if>
+      <log>Size: <value expr="size"/></log>
+      <assign name="curr_order.Size" expr="size"/>
+    </filled>
+  </field>
+  
+  <block>
+    <goto next="#frm_confirm_order"/>
+  </block>
+</form>
+
+
 <form id="frm_confirm_order">
   <var name="order_string" expr="''"/>
   
@@ -393,6 +493,8 @@
   </block>
   
   <script><![CDATA[
+      // build the string order_string that describes order in curr_order
+      // also set curr_order.Cost to the correct price for that item
       if (curr_order.Item == "pizza") {
         order_string = curr_order.Size + " ";
         if (curr_order.Size == "small") curr_order.Cost = 6.75 + 1.50 * curr_order.Toppings.length;
@@ -413,6 +515,9 @@
           } else if (curr_order.Toppings[0] == "spinach and feta") {
             if (curr_order.Size == "small") curr_order.Cost = 9.75;
             else curr_order.Cost = 14.95;
+          } else if (curr_order.Toppings[0] == "hawaiian") {
+            if (curr_order.Size == "small") curr_order.Cost = 9.75;
+            else curr_order.Cost = 13.95;
           }
         }
         if (curr_order.Number == "1")
@@ -429,9 +534,9 @@
         if (curr_order.Dressing == "blue cheese") curr_order.Cost += 0.75;
         
         if (curr_order.Number == "1")
-          order_string = "a " + order_string + "salad";
+          order_string = "a " + order_string + " salad";
         else {
-          order_string = curr_order.Number + " " + order_string + "salads";
+          order_string = curr_order.Number + " " + order_string + " salads";
           curr_order.Cost *= curr_order.Number;
         }
         order_string += " with " + curr_order.Dressing + " dressing";
@@ -442,14 +547,14 @@
     ]]>
   </script>
   
-  <subdialog name="get_confirmation" src="confirm.xml#getconfirmation">
+  <subdialog name="get_confirmation" src="#getconfirmation">
     <param name="confirm_prompt" expr="'You would like ' + order_string + '?'"/>
     <filled>
       <log>Jeff: Confirmed is <value expr="get_confirmation.yesno"/></log>
       <if cond="get_confirmation.yesno == 'no'">
         <prompt>Okay, let's try that part of the order again.</prompt>
         <assign name="curr_prompt" expr="'What would you like?'"/>
-        <clear namelist="curr_order get_confirmation"/>
+        <clear namelist="curr_order"/>
         <goto next="#frm_main"/>
       </if>
     </filled>
@@ -467,7 +572,7 @@
       <assign name="total_confidence_score" expr="confidence_score"/>
     </if>
     <assign name="curr_prompt" expr="'What else would you like?'"/>
-    <clear namelist="curr_order get_confirmation"/>
+    <clear namelist="curr_order"/>
     <goto next="#frm_main"/>
   </block>
 </form>
@@ -483,10 +588,8 @@
       <prompt> Thanks for your business! </prompt>
       <exit/>
     </if>
-    <!-- if we are very confident, then skip the confirmation
-    <if cond="total_confidence_score &gt; 0.8">
-      <assign name="get_confirmation" expr="true"/>
-    </if> -->
+    
+    <!-- we always confirm the final order, with a summary of items and cost -->
     
     <script><![CDATA[
       var order_summary = "";
@@ -495,9 +598,9 @@
       var total_drinks = 0;
       var total_cost = 0;
       for (var i = 0; i < all_orders.length; ++i) {
-        if (all_orders[i].Item == "pizza") total_pizzas += all_orders[i].Number;
-        else if (all_orders[i].Item == "salad") total_salads += all_orders[i].Number;
-        else if (all_orders[i].Item == "drink") total_drinks += all_orders[i].Number;
+        if (all_orders[i].Item == "pizza") total_pizzas += Number(all_orders[i].Number);
+        else if (all_orders[i].Item == "salad") total_salads += Number(all_orders[i].Number);
+        else if (all_orders[i].Item == "drink") total_drinks += Number(all_orders[i].Number);
         
         total_cost += all_orders[i].Cost;
       }
@@ -517,7 +620,7 @@
         if (total_drinks > 1) order_summary += "s";
       }
       total_cost *= 1.07;
-      order_summary += ", at a total cost of $" + total_cost.toFixed(2).toString() + ", including tax.";
+      order_summary += ", at a total cost with tax of $" + total_cost.toFixed(2).toString();
       
       the_prompt = 'Are you ready to place this order for ' + order_summary + '?';
       //the_prompt = 'Shall I place this order for ' + all_orders.length.toString() + ' <break time="120"/>; items?';
@@ -525,39 +628,7 @@
     </script>
   </block>
   
-<!--  <field name="get_confirmation">
-    <block>
-    <if cond="all_orders.length &gt; 1">
-      <prompt>Shall I place this order for <value expr="all_orders.length"/><break time="120"/> items?</prompt>
-    <else/>
-      <prompt>Shall I place this order for one <break time="120"/> item?</prompt>
-    </if>
-    </block>
-    <grammar maxage="0" src="yesno.xml"/>
-    <noinput>
-      Sorry I couldn't hear you. 
-      <reprompt/>
-    </noinput>
-    <nomatch>
-      Please say yes or no.
-      <value expr="confirm_prompt"/>
-    </nomatch>
-    <nomatch count="4">
-      <prompt>I'm not following you. Please call back later.</prompt>
-      <exit/>
-    </nomatch>
-    <help>
-      Please say yes or no.
-      <reprompt/>
-    </help>
-    <filled>
-      <if cond="get_confirmation.yesno == 'no'">
-        <goto next="#frm_restart"/>
-      </if>
-    </filled>
-  </field> -->
-  
-  <subdialog name="get_confirmation" src="confirm.xml#getconfirmation">
+  <subdialog name="get_confirmation" src="#getconfirmation">
     <param name="confirm_prompt" expr="the_prompt"/>
     <filled>
       <if cond="get_confirmation.yesno == 'no'">
@@ -582,33 +653,38 @@
     ]]>
   </script>
   
-  <subdialog name="get_phone_confirmation" src="confirm.xml#getconfirmation">
+  <subdialog name="get_phone_confirmation" src="#getconfirmation">
     <param name="confirm_prompt" expr="'Can you confirm your phone number is ' + sayPhoneNum(phone_num) + '?'"/>
-<!--        <say-as interpret-as="vxml:phone"><value expr="phone_num"/></say-as>? -->
     <filled>
       <log>Confirmation: <value expr="get_phone_confirmation.yesno"/></log>
-      <if cond="get_phone_confirmation.yesno == 'no'">
-        <subdialog name="get_phone_num" src="phonenum.xml#getphonenum">
-          <filled>
-            <assign name="phone_num" expr="get_phone_num.phonenum"/>
-          </filled>
-        </subdialog>
+      <if cond="get_phone_confirmation.yesno == 'yes'">
+        <assign name="get_phone_num" expr="true"/>
       </if>
     </filled>
   </subdialog>
   
-  <block>
-    <!-- make sure we don't go back to that nested subdialog -->
-    <assign name="get_phone_num" expr="true"/>
-  </block>
+  <subdialog name="get_phone_num" src="phonenum.xml#getphonenum">
+    <filled>
+      <assign name="phone_num" expr="get_phone_num.phonenum"/>
+      <clear namelist="get_phone_confirmation get_phone_num"/>
+    </filled>
+  </subdialog>
   
-  <subdialog name="get_delivery" src="confirm.xml#getconfirmation">
+<!--   <block>
+    make sure we don't go back to that nested subdialog
+    <assign name="get_phone_num" expr="true"/>
+  </block> -->
+  
+  <subdialog name="get_delivery" src="#getconfirmation">
     <param name="confirm_prompt" expr="'Would you like your order delivered?'"/>
     <filled>
       <assign name="delivery" expr="get_delivery.yesno"/>
       <log>Delivery: <value expr="delivery"/></log>
-      <if cond="delivery == 'no'">
-        <!-- don't need these fields -->
+      <if cond="delivery == 'yes'">
+        <!-- don't need this field if delivering -->
+        <assign name="name" expr="true"/>
+      <else/>
+        <!-- don't need these fields if not delivering -->
         <assign name="address" expr="true"/>
         <assign name="confirm_address" expr="true"/>
       </if>
@@ -616,14 +692,12 @@
   </subdialog>
   
   <record name="address" cond="delivery == 'yes'"
-    maxtime="10s" finalsilence="1000ms" dtmfterm="true" type="audio/x-wav">
-    <prompt timeout="5s">
-      What address should we deliver to?
-    </prompt>
+    maxtime="10s" finalsilence="700ms" dtmfterm="true" type="audio/x-wav">
+    <prompt timeout="5s"> What address should we deliver to? </prompt>
     <noinput> Please say your address. </noinput>
   </record>
   
-  <subdialog name="confirm_address" src="confirm.xml#getconfirmation" cond="delivery == 'yes'">
+  <subdialog name="confirm_address" src="#getconfirmation" cond="delivery == 'yes'">
     <prompt>You would like your order delivered to <audio expr="address"/></prompt>
     <param name="confirm_prompt" expr="'Is that correct?'"/>
     <filled>
@@ -634,20 +708,11 @@
     </filled>
   </subdialog>
   
-<!--  <field name="confirm_address" type="boolean" cond="delivery == 'yes'">
-    <grammar type="application/srgs+xml" src="/grammars/boolean.grxml"/>
-    <prompt>
-      You would like your order delivered to <audio expr="address"/>
-      Is this correct?
-    </prompt>
-    <filled>
-      <if cond="confirm">
-        <submit next="save_message.pl" enctype="multipart/form-data"
-           method="post" namelist="address"/>
-      </if>
-      <clear namelist="address confirm_address"/>
-    </filled>
-  </field> -->
+  <record name="name" cond="delivery == 'no'"
+    maxtime="4s" finalsilence="700ms" dtmfterm="true" type="audio/x-wav">
+    <prompt timeout="5s"> What name can I put on the order? </prompt>
+    <noinput> Please say your name. </noinput>
+  </record>
   
   <filled>
     <!-- post the confirmed order -->
@@ -666,6 +731,38 @@
     <exit/>
   </filled>
     
+</form>  <!-- end of frm_finished -->
+
+
+<!-- subdialog for yes/no confirmation -->
+<form id="getconfirmation">
+  <!-- override default confidence for this form - want to be more sure when we are confirming -->
+  <property name="confidencelevel" value="0.7"/>
+  <var name="confirm_prompt"/>
+  <field name="yesno">
+    <prompt><value expr="confirm_prompt"/></prompt>
+    <grammar maxage="0" src="yesno.xml"/>
+    <noinput>
+      Sorry I couldn't hear you. 
+      <reprompt/>
+    </noinput>
+    <nomatch>
+      Please say yes or no.
+      <value expr="confirm_prompt"/>
+    </nomatch>
+    <nomatch count="4">
+      <prompt>I'm not following you. Please call back later.</prompt>
+      <exit/>
+    </nomatch>
+    <help>
+      Please say yes or no.
+      <reprompt/>
+    </help>
+    <filled>
+      <log>yesno: <value expr="yesno"/></log>
+      <return namelist="yesno"/>
+    </filled>
+  </field>
 </form>
 
 </vxml>

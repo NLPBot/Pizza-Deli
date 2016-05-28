@@ -6,8 +6,8 @@
 <!-- a grammar for collecting Pizza Express restaurant orders -->
 
 <rule id="define_mixed" scope="public">
-  <item repeat="0-2"><ruleref uri="#intro"/></item>
-  <item repeat="0-2"><ruleref uri="#courtesy"/></item>
+  <item repeat="0-1"><ruleref uri="#intro"/></item>
+  <item repeat="0-1"><ruleref uri="#courtesy"/></item>
   <one-of>
     <!-- specify the different commands possible -->
     <item> <!-- food order -->
@@ -18,6 +18,9 @@
         </item>
         <item>
           <ruleref uri="#SALAD"/> <tag>out.Order=rules.SALAD;</tag>
+        </item>
+        <item>
+          <ruleref uri="#DRINK"/> <tag>out.Order=rules.DRINK;</tag>
         </item>
       </one-of>
       <tag>out.Cmd="Order";</tag>
@@ -132,6 +135,7 @@
     <item> chicken <item repeat="0-1"> kabob </item> and broccoli 
       <tag>out="chicken kabob and broccoli";</tag> </item>
     <item> barbeque chicken </item>
+    <item> hawaiian </item>
   </one-of>
 </rule>
 
@@ -165,7 +169,7 @@
       <tag>out="chicken kabob";</tag> </item>
     <item> greek </item>
     <item> chef </item>
-    <item> anitpasto </item>
+    <item> antipasto </item>
     <item> tuna </item>
     <item> caesar </item>
     <item> garden </item>
@@ -185,6 +189,45 @@
       <tag>out="raspberry vinaigrette";</tag> </item>
   </one-of>
 </rule>
+
+<!-- rule for specifying salad -->
+<rule id="DRINK">
+  <item repeat="0-1">
+    <ruleref uri="#NUMBER"/> <tag> out.Number=rules.NUMBER;</tag>
+  </item>
+  <item repeat="0-1">
+    <ruleref uri="#SIZE"/> <tag> out.Size=rules.SIZE;</tag>
+  </item>
+  <item>
+    <ruleref uri="#DRINKTYPE"/>
+    <tag>out.Type=rules.DRINKTYPE;</tag>
+  </item>
+  <tag>out.Item="drink";</tag>
+</rule>
+
+<!-- rule for salad types -->
+<rule id="DRINKTYPE">
+  <one-of>
+    <item>
+      <one-of>
+        <item>coke</item> <item>coca-cola</item>
+        <item>cokes</item> <item>coca-colas</item>
+      </one-of>
+      <tag>out="coke";</tag> </item>
+    <item> sprite </item>
+    <item> sprites <tag>out="sprite";</tag> </item>
+    <item> diet coke </item>
+    <item> diet cokes <tag>out="diet coke";</tag> </item>
+    <item> orange
+      <one-of>
+        <item>soda</item> <item>crush</item>
+        <item>sodas</item> <item>crushes</item>
+      </one-of>
+      <tag>out="orange soda";</tag>
+    </item>
+  </one-of>
+</rule>
+
 
 
 <!-- other rules -->
@@ -228,9 +271,7 @@
   <one-of>
     <item> hello </item>
     <item> hi </item>
-    <item> howdy </item>
     <item> good morning </item>
-    <item> good evening </item>
     <item> um </item>
     <item> uh </item>
     <item> yes </item>

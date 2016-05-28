@@ -7,8 +7,8 @@
 
 <rule id="yesno" scope="public">
   <one-of>
-    <item><ruleref uri="#yes"/> <tag>out.yesno="yes";</tag> </item>
-    <item><ruleref uri="#no"/> <tag>out.yesno="no";</tag> </item>
+    <item repeat="1-2"><ruleref uri="#yes"/> <tag>out.yesno="yes";</tag> </item>
+    <item repeat="1-2"><ruleref uri="#no"/> <tag>out.yesno="no";</tag> </item>
   </one-of>
   <item repeat="0-1"><ruleref uri="#courtesy"/></item>
 </rule>
@@ -20,8 +20,8 @@
     <item> OK </item>
     <item> yeah </item>
     <item> sure </item>
-    <item> yes ma'am </item>
-    <item> affirmative </item>
+    <item> it is </item>
+    <item> I am </item>
     <item>
       <item repeat="0-1">
         <one-of> <item>that is</item> <item>that's</item> </one-of>
@@ -29,7 +29,6 @@
       <one-of>
         <item> right </item>
         <item> correct </item>
-        <item> affirmative </item>
       </one-of>
     </item>
   </one-of>
@@ -39,10 +38,22 @@
   <one-of>
     <item> no </item>
     <item> nope </item>
-    <item> nah </item>
+<!--    <item> nah </item>
     <item> not </item>
     <item> no ma'am </item>
-    <item> negative </item>
+    <item>  </item>
+    <item> <item>it is</item> <item>it's</item> not </item> -->
+    <item>
+      <item repeat="0-1">
+        <one-of> <item>that is</item> <item>that's</item> </one-of>
+      </item>
+      <one-of>
+        <item> not right </item>
+        <item> wrong </item>
+        <item> not correct </item>
+        <item> incorrect </item>
+      </one-of>
+    </item>
   </one-of>
 </rule>
 

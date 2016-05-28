@@ -6,6 +6,8 @@
 
 <meta name="maintainer" content="jeff_heath@sil.org" />
 
+<property name="universals" value="help" />
+
 <!-- subdialog for getting a phone number -->
 <form id="getphonenum">
   <field name="phonenum" type="digits">
