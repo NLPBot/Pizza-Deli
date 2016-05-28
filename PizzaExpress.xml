@@ -448,7 +448,7 @@
   </block>
   
   <field name="size">
-    <prompt> What size <value expr="curr_order.Item"/> would you like? </prompt>
+    <prompt> What size <value expr="curr_order.Type"/> would you like? </prompt>
     <grammar src="PizzaExpress-grammar.xml#grm_size"/>
     <nomatch>
       Please say small or large.
@@ -540,6 +540,17 @@
           curr_order.Cost *= curr_order.Number;
         }
         order_string += " with " + curr_order.Dressing + " dressing";
+      } else if (curr_order.Item == "drink") {
+        order_string = curr_order.Size + " " + curr_order.Type;
+        if (curr_order.Size == "small") curr_order.Cost = 1.50;
+        else curr_order.Cost = 3.00;
+        
+        if (curr_order.Number == "1")
+          order_string = "a " + order_string;
+        else {
+          order_string = curr_order.Number + " " + order_string + "s";
+          curr_order.Cost *= curr_order.Number;
+        }
       } else {
         order_string = "invalid order";
         curr_order.Cost = 0;
