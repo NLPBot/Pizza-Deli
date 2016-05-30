@@ -27,5 +27,5 @@
 	}
 	$conn = connect();
 	$max = display($conn,$cookie_num);
-	echo $max;
+	echo "<max>".$max."</max>";
 ?>
