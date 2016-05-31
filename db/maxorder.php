@@ -27,5 +27,8 @@
 	}
 	$conn = connect();
 	$max = display($conn,$cookie_num);
-	echo "&lt;max&gt;$max&lt;/max&gt;";
+	Header('Content-type: text/xml');
+	echo "<max>$max</max>";
+	
 ?>
+
