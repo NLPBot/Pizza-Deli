@@ -1,8 +1,6 @@
-<?xml version="1.0"?>
-<vxml version="2.1">
-<form>
 <?php
-	
+
+
 	function confirm($order, $item, $quantity, $size, $details, $price) {
 		// Subject of confirmation email.
 		$conf_subject = 'Order Confirmation';
@@ -84,7 +82,6 @@ Thank you for your Order. Have a nice day!
     createTable($conn);
     insert($conn , $order, $item, $quantity, $size, $detail_string, $price);	
     confirm($order, $item, $quantity, $size, $detail_string, $price);
+    Header('Content-type: text/xml');
+    echo "<result>success</result>";
 ?>
-</form>
-</vxml>
-
