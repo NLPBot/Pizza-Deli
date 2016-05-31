@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?> 
-<vxml version="2.0" xmlns="http://www.w3.org/2001/vxml" xml:lang="en-US"
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml" xml:lang="en-US"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.w3.org/2001/vxml http://www.w3.org/TR/voicexml20/vxml.xsd"
   xmlns:voxeo="http://community.voxeo.com/xmlns/vxml">
@@ -19,6 +19,7 @@
 <var name="confidence_score" expr="0"/>
 <var name="total_confidence_score" expr="1"/>
 <var name="confirmed"/>
+<var name="total_cost" expr="0"/>
 
 <property name="universals" value="help repeat" />
 
@@ -170,7 +171,7 @@
 
 
 <!-- define a way to exit the session -->
-<form id="frm_exit">
+<form id="frm_cancel">
   <subdialog name="get_confirmation" src="#getconfirmation">
     <param name="confirm_prompt" expr="'Would you like to exit without placing an order?'"/>
     <filled>
@@ -499,12 +500,14 @@
         order_string = curr_order.Size + " ";
         if (curr_order.Size == "small") curr_order.Cost = 6.75 + 1.50 * curr_order.Toppings.length;
         else curr_order.Cost = 9.95 + 2.00 * curr_order.Toppings.length;
-
+        
         if (curr_order.Toppings.length > 1) {
-          order_string += curr_order.Toppings.slice(0,curr_order.Toppings.length-1).toString() +
-                 " and " + curr_order.Toppings[curr_order.Toppings.length-1] + " ";
+          curr_order.Details = curr_order.Toppings.slice(0,curr_order.Toppings.length-1).toString() +
+                 "|and " + curr_order.Toppings[curr_order.Toppings.length-1];
+          // commas don't work when submitting SQL parameters
+          curr_order.Details = curr_order.Details.replace(/,/g, '|');
         } else {
-          order_string += curr_order.Toppings[0] + " ";
+          curr_order.Details = curr_order.Toppings[0];
           // specialty pizzas have special prices
           if (["house special", "chicken kabob and broccoli", "barbeque chicken"].indexOf(curr_order.Toppings[0]) >= 0) {
             if (curr_order.Size == "small") curr_order.Cost = 10.50;
@@ -521,36 +524,37 @@
           }
         }
         if (curr_order.Number == "1")
-          order_string = "a " + order_string + "pizza";
+          order_string = "a " + curr_order.Size + " " + curr_order.Details + " pizza";
         else {
-          order_string = curr_order.Number + " " + order_string + "pizzas";
+          order_string = curr_order.Number + " " + curr_order.Size + " " + curr_order.Details + " pizzas";
           curr_order.Cost *= curr_order.Number;
         }
       } else if (curr_order.Item == "salad") {
-        order_string = curr_order.Type;
+        curr_order.Size = "";
         curr_order.Cost = 7.75;
         if (curr_order.Type == "chicken kabob") curr_order.Cost = 9.50;
         else if (curr_order.Type == "garden") curr_order.Cost = 6.75;
         if (curr_order.Dressing == "blue cheese") curr_order.Cost += 0.75;
         
         if (curr_order.Number == "1")
-          order_string = "a " + order_string + " salad";
+          order_string = "a " + curr_order.Type + " salad";
         else {
-          order_string = curr_order.Number + " " + order_string + " salads";
+          order_string = curr_order.Number + " " + curr_order.Type + " salads";
           curr_order.Cost *= curr_order.Number;
         }
         order_string += " with " + curr_order.Dressing + " dressing";
+        curr_order.Details = curr_order.Type + " with " + curr_order.Dressing;
       } else if (curr_order.Item == "drink") {
-        order_string = curr_order.Size + " " + curr_order.Type;
         if (curr_order.Size == "small") curr_order.Cost = 1.50;
         else curr_order.Cost = 3.00;
         
         if (curr_order.Number == "1")
-          order_string = "a " + order_string;
+          order_string = "a " + curr_order.Size + " " + curr_order.Type;
         else {
-          order_string = curr_order.Number + " " + order_string + "s";
+          order_string = curr_order.Number + " " + curr_order.Size + " " + curr_order.Type + "s";
           curr_order.Cost *= curr_order.Number;
         }
+        curr_order.Details = curr_order.Type;
       } else {
         order_string = "invalid order";
         curr_order.Cost = 0;
@@ -607,7 +611,7 @@
       var total_pizzas = 0;
       var total_salads = 0;
       var total_drinks = 0;
-      var total_cost = 0;
+      total_cost = 0;
       for (var i = 0; i < all_orders.length; ++i) {
         if (all_orders[i].Item == "pizza") total_pizzas += Number(all_orders[i].Number);
         else if (all_orders[i].Item == "salad") total_salads += Number(all_orders[i].Number);
@@ -634,7 +638,6 @@
       order_summary += ", at a total cost with tax of $" + total_cost.toFixed(2).toString();
       
       the_prompt = 'Are you ready to place this order for ' + order_summary + '?';
-      //the_prompt = 'Shall I place this order for ' + all_orders.length.toString() + ' <break time="120"/>; items?';
       ]]>
     </script>
   </block>
@@ -649,10 +652,10 @@
   </subdialog>
   
   <script><![CDATA[
+    // remove a '+' at beginning of phone number
+    phone_num = phone_num.replace(/^\+/, '');
+    
     function sayPhoneNum(num) {
-      // remove a '+' at beginning of number
-      num = num.replace(/^\+/, '');
-      
       var str = num.charAt(0);
       for(var i = 1; i < num.length; i++) {
         str += ' ' + num.charAt(i);
@@ -665,7 +668,7 @@
   </script>
   
   <subdialog name="get_phone_confirmation" src="#getconfirmation">
-    <param name="confirm_prompt" expr="'Can you confirm your phone number is ' + sayPhoneNum(phone_num) + '?'"/>
+    <param name="confirm_prompt" expr="'Is your phone number ' + sayPhoneNum(phone_num) + '?'"/>
     <filled>
       <log>Confirmation: <value expr="get_phone_confirmation.yesno"/></log>
       <if cond="get_phone_confirmation.yesno == 'yes'">
@@ -726,14 +729,77 @@
   </record>
   
   <filled>
-    <!-- post the confirmed order -->
-    <!-- <submit next="save_message.pl" enctype="multipart/form-data"
-           method="post" namelist="address"/> -->
+    <!-- <data name="max_order" src="http://students.washington.edu/jch65/PizzaExpress/max.xml"/> -->
+    <data name="max_order" src="http://students.washington.edu/cyc025/db/maxorder.php"/>
+    <var name="max_value" expr="max_order.documentElement.textContent"/>
+    <log>max_value: <value expr="max_value"/></log>
+    <var name="order" expr="Number(max_value) + 1;"/>
+    <log>order: <value expr="order"/></log>
     
     <if cond="delivery == 'yes'">
-      <prompt>Your order should be there in about 30 minutes.</prompt>
+      <subdialog name="post_audio" src="http://students.washington.edu/cyc025/db/post_address.php"
+            method="post" namelist="order address" fetchtimeout="20s">
+        <filled>
+          <log><value expr="post_audio.code"/></log>
+          <if cond="post_audio.code">
+          <else/>
+            <!-- error saving greeting -->
+            <log><value expr="post_audio.msg"/></log>
+          </if>
+        </filled>
+      </subdialog>
     <else/>
-      <prompt>Your order should be ready for pick up in about 20 minutes.</prompt>
+      <subdialog name="post_audio" src="http://students.washington.edu/cyc025/db/post_name.php"
+            method="post" namelist="order name" fetchtimeout="20s">
+        <filled>
+          <log><value expr="post_audio.code"/></log>
+          <if cond="post_audio.code">
+          <else/>
+            <!-- error saving greeting -->
+            <log><value expr="post_audio.msg"/></log>
+          </if>
+        </filled>
+      </subdialog>
+    </if>
+    
+    <!-- post the individual items in the confirmed order -->
+    <var name="item"/>
+    <var name="quantity"/>
+    <var name="size"/>
+    <var name="details"/>
+    <var name="price"/>
+    <foreach item="ord_obj" array="all_orders">
+      <assign name="item" expr="ord_obj.Item"/>
+      <assign name="quantity" expr="Number(ord_obj.Number);"/>
+      <assign name="size" expr="ord_obj.Size"/>
+      <assign name="details" expr="ord_obj.Details"/>
+      <assign name="price" expr="Number(ord_obj.Cost);"/>
+      <log>details: <value expr="details"/></log>
+      <data name="post_data" src="http://students.washington.edu/cyc025/db/post_data.php" method="post"
+              namelist="order item quantity size details price" />
+    </foreach>
+    
+    <!-- and post the order total -->
+    <assign name="item" expr="'total'"/>
+    <assign name="quantity" expr="0"/>
+    <assign name="size" expr="''"/>
+    <if cond="delivery == 'yes'">
+      <assign name="details" expr="'deliver'"/>
+    <else/>
+      <assign name="details" expr="'pickup'"/>
+    </if>
+    <assign name="details" expr="details + ' ' + phone_num + ' '"/>
+    <assign name="details" expr="details + 'http://students.washington.edu/cyc025/db/record/' + order + '.wav'"/>
+    <assign name="price" expr="total_cost"/>
+    <log>details: <value expr="details"/></log>
+    <data name="post_data" src="http://students.washington.edu/cyc025/db/post_data.php" method="post"
+            namelist="order item quantity size details price" />
+
+    <prompt>Your order total is $<value expr="total_cost.toFixed(2).toString();"/>,</prompt>
+    <if cond="delivery == 'yes'">
+      <prompt>and we should have it there in about 30 minutes.</prompt>
+    <else/>
+      <prompt>and it should be ready for pick up in about 20 minutes.</prompt>
     </if>
     <prompt>
       <break time="250ms" />
