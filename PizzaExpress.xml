@@ -118,7 +118,7 @@
     <catch event="nomatch" count="5"> 
       <log>Utterance: <value expr="application.lastresult$.utterance"/></log>
       <prompt>Sorry, I'm still not catching it.</prompt>
-      <goto next="#frm_finished"/>
+      <goto next="#frm_cancel"/>
     </catch>
     <catch event="help"> 
       <prompt>Say something like <break time="150"/> "I'd like a large sausage pizza" or "chef salad with ranch dressing".
@@ -151,7 +151,6 @@
       <!-- check if the item ordered is complete -->
       <assign name="curr_order" expr="Order" />
       <log>Item: <value expr="curr_order.Item"/></log>
-      <log>Toppings: <value expr="curr_order.Toppings"/></log>
       <if cond="Order.Item=='pizza'">
         <goto next="#frm_order_pizza"/>
       <elseif cond="Order.Item=='salad'" />
@@ -414,7 +413,7 @@
       <exit/>
     </nomatch>
     <help>
-      Please select the kind of salad you want, like italian, blue cheese or greek.
+      Please select the kind of salad dressing you want, like italian, blue cheese or greek.
     </help>
     <filled>
       <!-- keep lower confidence score -->
