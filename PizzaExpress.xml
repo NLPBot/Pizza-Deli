@@ -736,29 +736,13 @@
     <log>order: <value expr="order"/></log>
     
     <if cond="delivery == 'yes'">
-      <subdialog name="post_audio" src="http://students.washington.edu/cyc025/db/post_address.php"
-            method="post" namelist="order address" fetchtimeout="20s">
-        <filled>
-          <log><value expr="post_audio.code"/></log>
-          <if cond="post_audio.code">
-          <else/>
-            <!-- error saving greeting -->
-            <log><value expr="post_audio.msg"/></log>
-          </if>
-        </filled>
-      </subdialog>
+      <data name="post_audio" src="http://students.washington.edu/cyc025/db/post_address.php"
+            method="post" namelist="order address" fetchtimeout="20s" />
+      <!-- do something with return value? -->
     <else/>
-      <subdialog name="post_audio" src="http://students.washington.edu/cyc025/db/post_name.php"
-            method="post" namelist="order name" fetchtimeout="20s">
-        <filled>
-          <log><value expr="post_audio.code"/></log>
-          <if cond="post_audio.code">
-          <else/>
-            <!-- error saving greeting -->
-            <log><value expr="post_audio.msg"/></log>
-          </if>
-        </filled>
-      </subdialog>
+      <data name="post_audio" src="http://students.washington.edu/cyc025/db/post_name.php"
+            method="post" namelist="order name" fetchtimeout="20s" />
+      <!-- do something with return value? -->
     </if>
     
     <!-- post the individual items in the confirmed order -->
