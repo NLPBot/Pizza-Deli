@@ -737,11 +737,11 @@
     
     <if cond="delivery == 'yes'">
       <data name="post_audio" src="http://students.washington.edu/cyc025/db/post_address.php"
-            method="post" namelist="order address" fetchtimeout="20s" />
+            method="post" namelist="order address" fetchtimeout="20s" enctype="multipart/form-data"/>
       <!-- do something with return value? -->
     <else/>
       <data name="post_audio" src="http://students.washington.edu/cyc025/db/post_name.php"
-            method="post" namelist="order name" fetchtimeout="20s" />
+            method="post" namelist="order name" fetchtimeout="20s" enctype="multipart/form-data"/>
       <!-- do something with return value? -->
     </if>
     
