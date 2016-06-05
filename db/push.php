@@ -1,18 +1,5 @@
-
-<html>
-<form action="http://students.washington.edu/cyc025/db/insert.php" method="post">
-  <input name="order" value="order"/>
-  <input name="item" value="item"/>
-  <input name="quantity" value="quantity"/>
-  <input name="size" value="size"/>
-  <input name="details" value="details"/>
-  <input name="price" value="price"/>
-  <button>Complete Order</button>
-</form>
-</html>
-
 <?php
-	
+
 	function confirm($order, $item, $quantity, $size, $details, $price) {
 		// Subject of confirmation email.
 		$conf_subject = 'Order Confirmation';
@@ -42,7 +29,7 @@ Thank you for your Order. Have a nice day!
 		$mysqli_connection = new MySQLi('vergil.u.washington.edu', 'root', 'ernie', 'ordering_system', 8685);
 		
 		if($mysqli_connection->connect_error){
-		   echo "Not connected, error: ".$mysqli_connection->connect_error;
+		   return "Not connected, error: ".$mysqli_connection->connect_error;
 		}
 
 		return $mysqli_connection;
@@ -72,9 +59,9 @@ Thank you for your Order. Have a nice day!
 		VALUES ($order, \"$item\", $quantity, \"$size\", \"$details\", $price, 0)";
 
 		if ($conn->query($sql) === TRUE) {
-		    echo "Successfully Added";
+		    return "Successfully Added";
 		} else {
-		    echo "Error: " . $sql . "<br>" . $conn->error;
+		    return "Error: " . $sql . "<br>" . $conn->error;
 		}
 		
 		$conn->close();
@@ -94,9 +81,7 @@ Thank you for your Order. Have a nice day!
     createTable($conn);
     insert($conn , $order, $item, $quantity, $size, $detail_string, $price);	
     confirm($order, $item, $quantity, $size, $detail_string, $price);
+    Header('Content-type: text/xml');
+    echo "<result>success</result>";
 ?>
-
-
-
-
 

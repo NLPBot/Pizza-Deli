@@ -1,18 +1,5 @@
-
-<html>
-<form action="http://students.washington.edu/cyc025/db/insert.php" method="post">
-  <input name="order" value="order"/>
-  <input name="item" value="item"/>
-  <input name="quantity" value="quantity"/>
-  <input name="size" value="size"/>
-  <input name="details" value="details"/>
-  <input name="price" value="price"/>
-  <button>Complete Order</button>
-</form>
-</html>
-
 <?php
-	
+
 	function confirm($order, $item, $quantity, $size, $details, $price) {
 		// Subject of confirmation email.
 		$conf_subject = 'Order Confirmation';
@@ -41,8 +28,9 @@ Thank you for your Order. Have a nice day!
 		// Create connection
 		$mysqli_connection = new MySQLi('vergil.u.washington.edu', 'root', 'ernie', 'ordering_system', 8685);
 		
+		
 		if($mysqli_connection->connect_error){
-		   echo "Not connected, error: ".$mysqli_connection->connect_error;
+		   //echo "Not connected, error: ".$mysqli_connection->connect_error;
 		}
 
 		return $mysqli_connection;
@@ -60,22 +48,29 @@ Thank you for your Order. Have a nice day!
 		price DOUBLE(5,2) NOT NULL,
 		completed TINYINT(1),
 		PRIMARY KEY (id))";
-
+    
+        
 	    if ($conn->query($table) === FALSE) {
-		    echo "Error creating table: " . $conn->error;
+		    //echo "Error creating table: " . $conn->error;
 		}
+		
 	}
 
 	function insert($conn , $order, $item, $quantity, $size, $details, $price) 
     {
 		$sql = "INSERT INTO pizza_order (ORDER_NUM, ITEM, QUANTITY, SIZE, DETAIL, PRICE, COMPLETED)
 		VALUES ($order, \"$item\", $quantity, \"$size\", \"$details\", $price, 0)";
-
+        
+        
 		if ($conn->query($sql) === TRUE) {
-		    echo "Successfully Added";
-		} else {
-		    echo "Error: " . $sql . "<br>" . $conn->error;
+		    //echo "Successfully Added";
+		    echo "<result>success</result>";
+		} 
+		else {
+		    //echo "Error: " . $sql . "<br>" . $conn->error;
+		    echo "<result>"."Error: " . $sql . " " . $conn->error."</result>";
 		}
+		
 		
 		$conn->close();
 	}
@@ -91,12 +86,9 @@ Thank you for your Order. Have a nice day!
 	$detail_string = str_replace(str_split('[],"'), '', (string)$details);
 
 	$conn = connect();
+	Header('Content-type: text/xml');
     createTable($conn);
     insert($conn , $order, $item, $quantity, $size, $detail_string, $price);	
     confirm($order, $item, $quantity, $size, $detail_string, $price);
 ?>
-
-
-
-
 
