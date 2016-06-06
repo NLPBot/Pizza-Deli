@@ -250,12 +250,14 @@ label {
 		       if ($row["completed"]==1) {
 		       		$complete = "yes";	
 		       		$complete_orders = $complete_orders + 1;
+		       		echo  "<tr><td align=\"center\">";
 		       }
 		       else{
 		       		$complete = "no";
 		       		$incomplete_orders = $incomplete_orders + 1;
+		       		echo  "<tr bgcolor=\"#F6CECE\"><td align=\"center\">";
 		       }
-		       echo  "<tr><td align=\"center\">" . ($row["order_num"]) ."</td><td align=\"center\">". ($row["item"]) ."</td><td align=\"center\">". ($row["quantity"]) ."</td><td align=\"center\">". ($row["size"]) ."</td><td>";
+		       echo ($row["order_num"]) ."</td><td align=\"center\">". ($row["item"]) ."</td><td align=\"center\">". ($row["quantity"]) ."</td><td align=\"center\">". ($row["size"]) ."</td><td>";
 			       
 			       $button_name = parse_detail($detail_string);
 			       $audio_file = "temp";
