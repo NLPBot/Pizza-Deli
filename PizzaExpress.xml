@@ -728,7 +728,6 @@
   </record>
   
   <filled>
-    <!-- <data name="max_order" src="http://students.washington.edu/jch65/PizzaExpress/max.xml"/> -->
     <data name="max_order" src="http://students.washington.edu/cyc025/db/maxorder.php"/>
     <var name="max_value" expr="max_order.documentElement.textContent"/>
     <log>max_value: <value expr="max_value"/></log>
@@ -737,11 +736,11 @@
     
     <if cond="delivery == 'yes'">
       <data name="post_audio" src="http://students.washington.edu/cyc025/db/post_address.php"
-            method="post" namelist="order address" fetchtimeout="20s" enctype="multipart/form-data"/>
+            method="post" namelist="order address" fetchtimeout="20s" />
       <!-- do something with return value? -->
     <else/>
       <data name="post_audio" src="http://students.washington.edu/cyc025/db/post_name.php"
-            method="post" namelist="order name" fetchtimeout="20s" enctype="multipart/form-data"/>
+            method="post" namelist="order name" fetchtimeout="20s" />
       <!-- do something with return value? -->
     </if>
     
