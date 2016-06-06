@@ -1,21 +1,21 @@
 <?php
-Header('Content-type: text/xml');
 
-$msg = "";
-$code = 1;
+$tmpFile = $_POST["order"] . ".wav";
 
-$tmpFile=$_POST[“order”];
-$address = $_POST[“address”];
+//This is the directory where audio files will be saved
+$target = "audio/";
+$target = $target . basename( $tmpFile);
 
-if (is_uploaded_file($address)) 
-{
+//Writes the Filename to the server
+if(move_uploaded_file($_FILES["address"]["tmp_name"], $target)) {
+    //Tells you if its all ok
   $msg = "audio saved";
 } 
 else 
 {
   $msg = "unable to save audio";
 }
-
+Header('Content-type: text/xml');
 echo "<result>". $msg ."</result>";
 
 ?>

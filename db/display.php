@@ -76,7 +76,7 @@ label {
 	{
 		window.location = window.location.href;
 	}
-	 setInterval('autoRefresh()', 10000); // this will reload page after every 5 secounds; 
+	 setInterval('autoRefresh()', 100000); // this will reload page after every 5 secounds; 
 </script>
 <body>
 <div class="container">
@@ -223,7 +223,7 @@ label {
 
 		if (mysqli_num_rows($result) > 0) {
 
-			echo "<table><tr bgcolor=\"#819FF7\"><th>Order Number</th><th>Item</th><th>Quantity</th><th>Size</th><th>Detail</th><th>Audio</th><th>Price(\$)</th><th>Date</th><th>Complete</th></tr>";
+			echo "<table><tr bgcolor=\"#819FF7\"><th>Order Number</th><th>Item</th><th>Quantity</th><th>Size</th><th>Detail</th><th>Name/Address</th><th>Price(\$)</th><th>Date</th><th>Complete</th></tr>";
 		    // output data of each row
 		    while($row = mysqli_fetch_assoc($result)) {
 		       if( $total_orders == $cookie_num ) {
@@ -270,10 +270,14 @@ label {
 		           
 		                echo (str_replace($url,"",$detail_string)) ;  
 		                      
-		               echo "</td><td align=\"center\"><form action=\"http://students.washington.edu/cyc025/db/audio/$audio_file\" method=\"post\">
-		               		<input type=\"hidden\" name=\"id\" value=$id style=\"float: right;\">
-					        <button >$button_name</button>
-		               		</form>";
+		               echo "</td><td align=\"center\">";
+		               echo "<audio controls style=\"width: 150px;\"> <source src=\"http://students.washington.edu/cyc025/db/audio/$audio_file\" type=\"audio/mpeg\">Your browser does not support the audio element.
+</audio>";
+		               //<audio preload=\"auto\" src=\"http://students.washington.edu/cyc025/db/audio/$audio_file\" loop=\"true\" autobuffer> Unsupported in Firefox </audio>";
+		               //<form action=\"http://students.washington.edu/cyc025/db/audio/$audio_file\" method=\"post\">
+		               	//echo "<input type=\"hidden\" name=\"id\" value=$id style=\"float: right;\">
+					     //   <button >$button_name</button>
+		               		//</form>";
 		           }
 		           else {
 
