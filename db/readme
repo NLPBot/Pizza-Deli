@@ -3,22 +3,7 @@ Documentation of the database
 Everything is available under the http://students.washington.edu/cyc025/db/ directory. 
 so it would be http://students.washington.edu/cyc025/db/[file name]
 
-why I couldn't use python CGI scripts?
-At this moment, I haven't figured out a way to allow the server to listen to the cgi scripts 
-since traditionally these scripts are placed within a specific folder named "bin-cgi" or someting
-so so far I haven't done so.
-php scripts are supposed to be able to do all things possible that can be done with cgi scripts.
-
-To-do: 
- 
-1. DETAILS field -> 200 characters long? 
-2. No LAST_NAME field 
-3. PRICE field -> number field
-4. Python CGI script to save the recording of the address to a .WAV file out on the server. And it uses the telephone number as the file name. We are also going to need some way to save out the recordings, maybe by order number to a subdirectory.
-5. Need three other fields in our database: ORDER_NUM, DATE (which would obviously be a date) and COMPLETED (which would be a Boolean yes/no field). The ORDER_NUM would be used to keep all items of an order together, with a unique number. 
-6. to be added...
-
-Schema:
+Database Schema:
 
 		$table = "CREATE TABLE pizza_order (
 		id INT(6) UNSIGNED PRIMARY KEY, 
@@ -30,91 +15,59 @@ Schema:
 		price DOUBLE(5,3) NOT NULL,
 		completed TINYINT(1))"
 
+===========================================================
+
+display.php
+
+Display main page for all orders.
 
 ===========================================================
 
-How you should have your vxml to post to database directly:
+manage.php  
+
+Allow shop owners to manage orders by either confirm them or cancel them.
 
 ===========================================================
 
-<?xml version="1.0"?>
-<vxml version="2.1">
-  <form>
-    <field name="order" type="digits">
-      <filled>
-        <submit next="http://students.washington.edu/cyc025/db/insert.php" method="post" namelist="order"/>
-      </filled>
-    </field>
-    <field name="item" type="digits">
-      <filled>
-        <submit next="http://students.washington.edu/cyc025/db/insert.php" method="post" namelist="item"/>
-      </filled>
-    </field>
-    <field name="quantity" type="digits">
-      <filled>
-        <submit next="http://students.washington.edu/cyc025/db/insert.php" method="post" namelist="quantity"/>
-      </filled>
-    </field>
-    <field name="size" type="digits">
-      <filled>
-        <submit next="http://students.washington.edu/cyc025/db/insert.php" method="post" namelist="size"/>
-      </filled>
-    </field>
-    <field name="details" type="digits">
-      <filled>
-        <submit next="http://students.washington.edu/cyc025/db/insert.php" method="post" namelist="details"/>
-      </filled>
-    </field>
-    <field name="price" type="digits">
-      <filled>
-        <submit next="http://students.washington.edu/cyc025/db/insert.php" method="post" namelist="price"/>
-      </filled>
-    </field>
-  </form>
-</vxml>
+post_data.php 
 
-or 
-
-<block>
-
-  <var name="order_num" expr="5"/>
-
-  <var name="item" expr="pizza"/>
-
-  <var name="quantity" expr="1"/>
-
-  <var name="size" expr="large"/>
-
-  <var name="details" expr="['sausage', 'green pepper']"/>
-
-  <var name="price" expr="13.95"/>
-
-  <submit next="url/get.php " method="post" namelist="order_num item quantity size details price" />
-
-</block>
-
-
-
+Post order data to database.
 
 ===========================================================
 
-post_form.py 
+post_name.php
 
-example python script to post to get.php
+Post name audio file to database.
 
 ===========================================================
 
-# -*- coding: utf-8 -*-
-import urllib, urllib2
-page = 'http://students.washington.edu/cyc025/db/insert.php'
-order = '3'
-items = 'pizza'
-quantity = '100'
-size = 'small'
-details = 'cheese'
-price = '12'
-raw_params = {'order': unicode(order, "utf-8"),'item': unicode(items, "utf-8"),'quantity':unicode(quantity, "utf-8"), 'size':unicode(size, "utf-8"),'details':unicode(details, "utf-8"),'price':unicode(price, "utf-8")}
-params = urllib.urlencode(raw_params)
-request = urllib2.Request(page, params)
-page = urllib2.urlopen(request)
-info = page.info()
+post_address.php
+
+Post address audio file to database.
+
+===========================================================
+
+maxorder.php
+
+Return current maximum order.
+
+===========================================================
+
+insert.php
+
+Connector with database, to post data into database.
+
+===========================================================
+
+upload.php
+
+Allow admin to directly add audio files.
+
+===========================================================
+
+form.html
+
+Allow admin to directly add orders.
+
+===========================================================
+
